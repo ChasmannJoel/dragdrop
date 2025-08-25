@@ -213,7 +213,7 @@ export default function App() {
       >
         <h1 style={title}>Soltá aquí tu archivo CSV o XLSX</h1>
         <p style={hint}>
-          También podés elegirlo manualmente:
+          También podés elegirlo manualmente...
         </p>
         <label style={inputBtn}>
           Elegir archivo

@@ -52,6 +52,20 @@ export default function ContactCounter() {
     }));
 
     setResults(resultArray);
+
+    // Enviar los datos al servidor por cada usuario
+    resultArray.forEach((item) => {
+      fetch("http://168.231.70.228:3030/panel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          panel: item.user,
+          contactos_unicos: item.contacts,
+        }),
+      });
+    });
   };
 
   const handleDrop = (e) => {
