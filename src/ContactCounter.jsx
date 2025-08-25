@@ -4,6 +4,7 @@ import Papa from "papaparse";
 
 export default function ContactCounter() {
   const [results, setResults] = useState([]);
+  const [lastSent, setLastSent] = useState(null);
 
   const handleFile = (file) => {
     const reader = new FileReader();
@@ -52,30 +53,40 @@ export default function ContactCounter() {
     }));
 
     setResults(resultArray);
+    setLastSent(null);
+  };
 
-    // Enviar los datos al servidor por cada usuario
-    resultArray.forEach((item) => {
-      fetch("http://168.231.70.228:3030/panel", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          panel: item.user,
-          contactos_unicos: item.contacts,
-        }),
-      })
-        .then((response) => {
-          if (response.ok) {
-            console.log(`Enviado: ${item.user} (${item.contacts})`);
-          } else {
-            console.error(`Error al enviar: ${item.user}`);
-          }
+  const sendToServer = () => {
+    if (!results.length) return;
+    let sent = [];
+    Promise.all(
+      results.map((item) =>
+        fetch("http://168.231.70.228:3030/panel", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            panel: item.user,
+            contactos_unicos: item.contacts,
+          }),
         })
-        .catch((error) => {
-          console.error(`Fallo de red al enviar: ${item.user}`, error);
-        });
+          .then((response) => {
+            if (response.ok) {
+              sent.push(`Enviado: ${item.user} (${item.contacts})`);
+            } else {
+              sent.push(`Error al enviar: ${item.user}`);
+            }
+          })
+          .catch((error) => {
+            sent.push(`Fallo de red al enviar: ${item.user}`);
+          })
+      )
+    ).then(() => {
+      setLastSent(sent.join("\n"));
+      console.log(sent.join("\n"));
     });
+  };
   };
 
   const handleDrop = (e) => {
@@ -95,25 +106,37 @@ export default function ContactCounter() {
       </p>
 
       {results.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-lg border border-gray-400 mx-auto shadow-lg">
-            <thead>
-              <tr className="bg-blue-400 text-white text-xl">
-                <th className="border p-4">Usuario</th>
-                <th className="border p-4">Contactos únicos</th>
-              </tr>
-            </thead>
-            <tbody>
-              {results.map((r) => (
-                <tr key={r.user} className="text-center">
-                  <td className="border p-4 font-semibold">{r.user}</td>
-                  <td className="border p-4">{r.contacts}</td>
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full text-lg border border-gray-400 mx-auto shadow-lg">
+              <thead>
+                <tr className="bg-blue-400 text-white text-xl">
+                  <th className="border p-4">Usuario</th>
+                  <th className="border p-4">Contactos únicos</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {results.map((r) => (
+                  <tr key={r.user} className="text-center">
+                    <td className="border p-4 font-semibold">{r.user}</td>
+                    <td className="border p-4">{r.contacts}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <button
+            onClick={sendToServer}
+            className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg font-bold shadow hover:bg-blue-700"
+          >
+            Enviar datos al servidor
+          </button>
+          {lastSent && (
+            <pre className="mt-4 text-left text-sm bg-gray-100 p-4 rounded border border-gray-300 whitespace-pre-wrap">
+              {lastSent}
+            </pre>
+          )}
+        </>
       )}
     </div>
   );
-}
