@@ -64,7 +64,17 @@ export default function ContactCounter() {
           panel: item.user,
           contactos_unicos: item.contacts,
         }),
-      });
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log(`Enviado: ${item.user} (${item.contacts})`);
+          } else {
+            console.error(`Error al enviar: ${item.user}`);
+          }
+        })
+        .catch((error) => {
+          console.error(`Fallo de red al enviar: ${item.user}`, error);
+        });
     });
   };
 
