@@ -87,7 +87,6 @@ export default function ContactCounter() {
       console.log(sent.join("\n"));
     });
   };
-  };
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -140,3 +139,4 @@ export default function ContactCounter() {
       )}
     </div>
   );
+}
