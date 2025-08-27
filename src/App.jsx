@@ -232,7 +232,7 @@ export default function App() {
                   let sent = [];
                   Promise.all(
                     results.map((item) =>
-                      fetch("http://168.231.70.228:3030/panel", {
+                      fetch("/api/panel"), {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/json",
