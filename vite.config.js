@@ -12,6 +12,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/ayer': {
+        target: 'http://168.231.70.228:3040',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

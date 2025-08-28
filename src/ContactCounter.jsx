@@ -3,6 +3,38 @@ import * as XLSX from "xlsx";
 import Papa from "papaparse";
 
 export default function ContactCounter() {
+  // Enviar datos al endpoint /api/ayer
+  const sendToAyer = () => {
+    if (!results.length) return;
+    let sent = [];
+    Promise.all(
+      results.map((item) =>
+        fetch("/api/ayer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            panel: item.user,
+            contactos_unicos: item.contacts,
+          }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              sent.push(`Enviado a ayer: ${item.user} (${item.contacts})`);
+            } else {
+              sent.push(`Error al enviar a ayer: ${item.user}`);
+            }
+          })
+          .catch((error) => {
+            sent.push(`Fallo de red al enviar a ayer: ${item.user}`);
+          })
+      )
+    ).then(() => {
+      setLastSent(sent.join("\n"));
+      console.log(sent.join("\n"));
+    });
+  };
   const [results, setResults] = useState([]);
   const [lastSent, setLastSent] = useState(null);
 
@@ -129,6 +161,12 @@ export default function ContactCounter() {
             className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg font-bold shadow hover:bg-blue-700"
           >
             Enviar datos al servidor
+          </button>
+          <button
+            onClick={sendToAyer}
+            className="mt-6 ml-4 px-6 py-3 bg-yellow-400 text-black rounded-lg font-bold shadow hover:bg-yellow-500"
+          >
+            Enviar datos a ayer
           </button>
           {lastSent && (
             <pre className="mt-4 text-left text-sm bg-gray-100 p-4 rounded border border-gray-300 whitespace-pre-wrap">
