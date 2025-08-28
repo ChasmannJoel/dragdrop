@@ -261,9 +261,10 @@ export default function App() {
                 style={{marginBottom: 24, padding: "12px 32px", background: "#2563eb", color: "white", border: "none", borderRadius: 8, fontWeight: "bold", fontSize: 18, cursor: "pointer"}}
                 onClick={() => {
                   let sent = [];
+                  const url = "/api/panel";
                   Promise.all(
                     results.map((item) =>
-                      fetch("/api/panel", {
+                      fetch(url, {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/json",
@@ -286,6 +287,7 @@ export default function App() {
                     )
                   ).then(() => {
                     setLastSent(sent.join("\n"));
+                    console.log("Éxito: Datos enviados a", url);
                   });
                 }}
               >
