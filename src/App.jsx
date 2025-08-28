@@ -4,6 +4,37 @@ import * as XLSX from "xlsx";
 import Papa from "papaparse";
 
 export default function App() {
+  // Enviar datos al endpoint /api/ayer
+  const sendToAyer = () => {
+    if (!results.length) return;
+    let sent = [];
+    Promise.all(
+      results.map((item) =>
+        fetch("/api/ayer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            panel: item.user,
+            contactos_unicos: item.contacts,
+          }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              sent.push(`Enviado a ayer: ${item.user} (${item.contacts})`);
+            } else {
+              sent.push(`Error al enviar a ayer: ${item.user}`);
+            }
+          })
+          .catch((error) => {
+            sent.push(`Fallo de red al enviar a ayer: ${item.user}`);
+          })
+      )
+    ).then(() => {
+      setLastSent(sent.join("\n"));
+    });
+  };
   const [results, setResults] = useState([]);
   const [totals, setTotals] = useState({ totalUsers: 0, totalContactsAll: 0 });
   const [dragActive, setDragActive] = useState(false);
@@ -259,6 +290,12 @@ export default function App() {
                 }}
               >
                 Enviar datos al servidor
+              </button>
+              <button
+                style={{marginBottom: 24, marginLeft: 16, padding: "12px 32px", background: "#facc15", color: "black", border: "none", borderRadius: 8, fontWeight: "bold", fontSize: 18, cursor: "pointer"}}
+                onClick={sendToAyer}
+              >
+                Enviar datos a ayer
               </button>
               {lastSent && (
                 <pre style={{marginTop: 16, background: "#f3f4f6", padding: 12, borderRadius: 6, fontSize: 14, color: "#111827"}}>{lastSent}</pre>
