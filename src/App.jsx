@@ -10,7 +10,7 @@ export default function App() {
     let sent = [];
     Promise.all(
       results.map((item) =>
-        fetch("/api/ayer", {
+        fetch("/ayer", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
