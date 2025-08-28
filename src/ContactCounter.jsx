@@ -9,7 +9,7 @@ export default function ContactCounter() {
     let sent = [];
     Promise.all(
       results.map((item) =>
-        fetch("/ayer", {
+        fetch("/api/ayer", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
